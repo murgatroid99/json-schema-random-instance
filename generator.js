@@ -33,8 +33,8 @@
 
   // Generates an instance of a schema of type array
   gen["array"] = function(schema){
-    var maxItems = _.has(schema, "maxItems") ? schema.maxItems : Infinity;
-    var minItems = _.has(schema, "minItems") ? schema.minItems : 0;
+    var maxItems = schema.maxItems;
+    var minItems = schema.minItems;
     var intance = [];
     var amount;
     var items;
@@ -57,7 +57,7 @@
         }
       } else {
         // typeof(items) === "object"
-        amount = _.random(minItems+1, maxItems === Infinity ? defaultMax : maxItems);
+        amount = _.random(minItems+1, maxItems);
         for(i=0; i<amount; i++){
           instance[i] = generate(items);
         }
@@ -72,28 +72,15 @@
   };
 
   gen["integer"] = function(schema){
-    var min;
-    var max;
-    var multipleOf = 1;
-    if(_.has(schema, "minimum")){
-      min = schema.minimum;
-    } else {
-      min = -defaultMax;
-    }
-    if(_.has(schema, "maximum")){
-      max = schema.maximum;
-    } else {
-      max = defaultMax;
-    }
-    if(_.has(schema, "multipleOf")){
-      multipleOf = schema.multipleOf;
-    }
+    var min = schema.minimum;
+    var max = schema.maximum;
+    var multipleOf = schema.multipleOf;
     return multipleOf * _.random(min, max);
   };
 
   gen["number"] = function(schema){
     var value = gen["integer"](schema);
-    if(_.has(schema, "maximum") && value>=schema.maximum){
+    if(value>=schema.maximum){
       value = schema.maximum - 1;
     }
     return value + Math.random();
@@ -106,28 +93,27 @@
   gen["object"] = function(schema){
     var remaining = _.keys(schema.properties);
     var instance = {};
-    var min = _.has(schema, "minProperties") ? schema.minProperties : 0;
-    var max = _.has(schema, "maxProperties") ? schema.maxProperties : Infinity;
-    if(_.has(schema, "required")){
-      _.each(schema.required, function(subschema, name){
-        instance[name] = generate(subschema);
-      });
-      remaining = _.difference(remaining, schema.required);
-    }
-    
+    var min = schema.minProperties;
+    var max = schema.maxProperties;
+    _.each(schema.required, function(name){
+      instance[name] = generate(schema.properties[name]);
+    });
+    remaining = _.difference(remaining, schema.required);
+    var amount = _.random(Math.max(min, schema.required.length), max) - schema.required.length;
+    _.each(remaining.slice(0, amount), function(name){
+      instance[name] = generate(schema.properties[name]);
+    });
+    return instance;
   };
 
   gen["string"] = function(schema){
-    var min;
-    var max;
+    var min = Math.max(0, schema.minLength);
+    var max = schema.maxLength;
     if(_.has(schema, "pattern")){
       return randexp(schema.pattern);
     }
-    min = Math.max(0, schema.minLength);
-    if(_.has(schema, "maxLength")){
-      max = schema.maxLength;
-    } else {
-      max = defaultMax;
+    if(_.has(schema, "format")){
+      return genFormat(schema.format);
     }
     return randexp('.{'+min+','+max+'}');
   };
@@ -362,6 +348,19 @@
     delete schema.allOf;
     if(_.has(schema, "oneOf")){
       schema.oneOf = _.map(schema.oneOf, normalize);
+    }
+    schema.properties = _.object(_.map(schema.properties, function(value, name){
+      return [name, normalize(value)]
+    }));
+    schema.patternProperties = _.object(_.map(schema.patternProperties, function(value, name){
+      return [name, normalize(value)]
+    }));
+    if(_.isObject(schema.additionalProperties)){
+      schema.additionalProperties = normalize(schema.additionalProperties);
+    }
+    schema.items = _.map(schema.items, normalize);
+    if(_.isObject(schema.additionalItems)){
+      schema.additionalItems = normalize(schema.additionalItems);
     }
     _.each(allOf, function(subschema){
       schema = mergeSchemas(schema, normalize(subschema));

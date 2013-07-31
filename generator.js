@@ -2,7 +2,12 @@
   "use strict";
   
   var _ = require("underscore");
-  var randexp = require("randexp");
+  var RandExp = require("randexp")
+  var randexp = RandExp.randexp;
+
+  RandExp.prototype.anyRandChar = function(){
+    return String.fromCharCode(_.random(48, 90));
+  };
 
   var defaultMax = 20;
 
@@ -10,7 +15,7 @@
   var gen = {};
 
   // Generates an instance of a schema that has an enum property.
-  gen_enum = function(schema){
+  var gen_enum = function(schema){
     return schema["enum"][_.random(schema["enum"].length)];
   };
 
@@ -104,7 +109,7 @@
     var min;
     var max;
     if(_.has(schema, "pattern")){
-      return new RandExp(schema.pattern).gen();
+      return randexp(schema.pattern);
     }
     min = Math.max(0, schema.minLength);
     if(_.has(schema, "maxLength")){
@@ -112,12 +117,12 @@
     } else {
       max = defaultMax;
     }
-    return new RandExp('.{'+min+','+max+'}').gen();
+    return randexp('.{'+min+','+max+'}');
   };
 
   function choose(schema){
     if(_.has(schema, "oneOf")){
-      return mergeSchemas(schema, schema.oneOf[_.random(schema.oneOf.length)]);
+      return mergeSchemas(schema, schema.oneOf[_.random(schema.oneOf.length-1)]);
     } else {
       return schema;
     }
@@ -128,7 +133,7 @@
     if(_.isEmpty(choice.type)){
       return null;
     } else {
-      return gen[choice.type[_.random(choice.type.length)]](schema);
+      return gen[choice.type[_.random(choice.type.length-1)]](schema);
     }
   };
 
@@ -343,7 +348,9 @@
     schema = _.defaults(schema, defaultSchema);
     allOf = schema.allOf;
     delete schema.allOf;
-    schema.oneOf = _.map(schema.oneOf, normalize);
+    if(_.has(schema, "oneOf")){
+      schema.oneOf = _.map(schema.oneOf, normalize);
+    }
     _.each(allOf, function(subschema){
       schema = mergeSchemas(schema, normalize(subschema));
     });

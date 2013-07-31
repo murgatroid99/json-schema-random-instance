@@ -217,3 +217,13 @@ pip-log.txt
 ## Emacs
 *~
 \#*\#
+
+###########
+## Node
+###########
+
+*.node
+build/
+Debug/
+Release/
+npm-debug.log

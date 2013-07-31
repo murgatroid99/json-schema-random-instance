@@ -19,6 +19,18 @@
     return schema["enum"][_.random(schema["enum"].length)];
   };
 
+  var genFormat = function(format){
+    switch(format){
+      case "date-time" : return new Date(_.random(100000000000000)).toISOString();
+      case "email" : return randexp(/\w+@example\.com/);
+      case "hostname" : return randexp(/\w+\.example\.com/);
+      case "ipv4" : return _.map([1,2,3,4], function(){return _.random(255).toString();}).join('.');
+      case "ipv6" : return randexp(/[abcdef\d]{4}(:[abcdef\d]{4}){7}/);
+      case "uri" : return randexp(/\w+\.example\.com\/\w+/);
+      default : return randexp(/.*/);
+    }
+  };
+
   // Generates an instance of a schema of type array
   gen["array"] = function(schema){
     var maxItems = _.has(schema, "maxItems") ? schema.maxItems : Infinity;

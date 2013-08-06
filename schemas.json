@@ -1,0 +1,1109 @@
+{
+  "order": {
+    "order_guest": {
+      "type": "object",
+      "title": "Guest Order",
+      "description": "Place an order to a restaurant as a guest",
+      "required": [
+        "rid",
+        "em",
+        "tray",
+        "tip",
+        "first_name",
+        "last_name",
+        "phone",
+        "zip",
+        "addr",
+        "city",
+        "state",
+        "card_number",
+        "card_cvc",
+        "card_expiry",
+        "card_bill_addr",
+        "card_bill_city",
+        "card_bill_state",
+        "card_bill_zip",
+        "card_bill_phone"
+      ],
+      "meta": {
+        "uri": "/o/{rid}",
+        "method": "POST",
+        "userAuth": false,
+        "response": "order"
+      },
+      "properties": {
+        "rid": {
+          "type": "string",
+          "description": "Ordr.in's unique restaurant identifier for the restaurant.",
+          "formatDescription": "A number",
+          "pattern": "^[0-9]+$",
+          "default_value": "10517"
+        },
+        "em": {
+          "type": "string",
+          "description": "The customer's email address",
+          "format": "email",
+          "default_value": "test@example.com"
+        },
+        "tray": {
+          "type": "string",
+          "description": "Represents a tray of menu items in the format '[menu item id]/[qty],[option id],...,[option id]'",
+          "pattern": "^([0-9]+/[0-9]+(,[0-9]+)*(\\+(?=[0-9]))?)+$",
+          "default_value": "13621733/2,13621743+13621799/1"
+        },
+        "tip": {
+          "type": "string",
+          "description": "Tip amount in dollars and cents",
+          "pattern": "[0-9]+\\.[0-9]{2}",
+          "default_value": "5.00"
+        },
+        "first_name": {
+          "type": "string",
+          "description": "The customer's first name",
+          "default_value": "Test"
+        },
+        "last_name": {
+          "type": "string",
+          "description": "The customer's last name",
+          "default_value": "User"
+        },
+        "phone": {
+          "type": "string",
+          "description": "The customer's phone number",
+          "format": "phone",
+          "mutator": "phone",
+          "default_value": "555-555-5555"
+        },
+        "zip": {
+          "type": "string",
+          "description": "The zip code part of the address",
+          "formatDescription": "5 digits",
+          "pattern": "^[0-9]{5}$",
+          "default_value": "10003"
+        },
+        "addr": {
+          "type": "string",
+          "description": "The street address",
+          "default_value": "900 Broadway"
+        },
+        "addr2": {
+          "type": "string",
+          "description": "The second part of the street address, if needed"
+        },
+        "city": {
+          "type": "string",
+          "description": "The city part of the address",
+          "default_value": "New York"
+        },
+        "state": {
+          "type": "string",
+          "description": "The state part of the address",
+          "formatDescription": "Two letters",
+          "pattern": "^[A-Za-z]{2}$",
+          "mutator": "state",
+          "default_value": "NY"
+        },
+        "card_name": {
+          "type": "string",
+          "description": "Full name as it appears on the credit card",
+          "default_value": "Test User"
+        },
+        "card_number": {
+          "type": "string",
+          "description": "Credit card number",
+          "formatDescription": "16 digits",
+          "pattern": "^[0-9]{16}$",
+          "default_value": "4111111111111111"
+        },
+        "card_cvc": {
+          "type": "string",
+          "description": "3 or 4 digit security code",
+          "formatDescription": "3 or 4 digits",
+          "pattern": "^[0-9]{3,4}$",
+          "default_value": "000"
+        },
+        "card_expiry": {
+          "type": "string",
+          "description": "The credit card expiration date.",
+          "formatDescription": "mm/yyyy",
+          "pattern": "^[0-9]{2}/[0-9]{4}$",
+          "default_value": "12/2121"
+        },
+        "card_bill_addr": {
+          "type": "string",
+          "description": "The credit card's billing street address",
+          "default_value": "900 Broadway"
+        },
+        "card_bill_addr2": {
+          "type": "string",
+          "description": "The second part of the credit card's biling street address."
+        },
+        "card_bill_city": {
+          "type": "string",
+          "description": "The credit card's billing city",
+          "default_value": "New York"
+        },
+        "card_bill_state": {
+          "type": "string",
+          "description": "The credit card's billing state",
+          "formatDescription": "2 letters",
+          "pattern": "^[A-Za-z]{2}$",
+          "mutator": "state",
+          "default_value": "NY"
+        },
+        "card_bill_zip": {
+          "type": "string",
+          "description": "The credit card's billing zip code",
+          "formatDescription": "5 digits",
+          "pattern": "^[0-9]{5}$",
+          "default_value": "10003"
+        },
+        "card_bill_phone": {
+          "type": "string",
+          "description": "The credit card's billing phone number",
+          "format": "phone",
+          "mutator": "phone",
+          "default_value": "555-555-5555"
+        }
+      },
+      "split_id": "addr",
+      "allOf": [
+        {
+          "split": false,
+          "oneOf": [
+            {
+              "required": [
+                "delivery_date",
+                "delivery_time"
+              ],
+              "properties": {
+                "delivery_date": {
+                  "type": "string",
+                  "description": "Delivery date",
+                  "formatDescription": "mm-dd",
+                  "pattern": "^[0-9]{2}-[0-9]{2}$"
+                },
+                "delivery_time": {
+                  "type": "string",
+                  "description": "Delivery time",
+                  "formatDescription": "HH:MM",
+                  "pattern": "^[0-9]{2}:[0-9]{2}$"
+                }
+              }
+            },
+            {
+              "required": [
+                "delivery_date"
+              ],
+              "properties": {
+                "delivery_date": {
+                  "type": "string",
+                  "description": "Delivery date",
+                  "formatDescription": "ASAP",
+                  "pattern": "^ASAP$",
+                  "default_value": "ASAP"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "order_user": {
+      "type": "object",
+      "title": "User Order",
+      "description": "Place an order to a restaurant as a user",
+      "required": [
+        "rid",
+        "tray",
+        "tip",
+        "first_name",
+        "last_name"
+      ],
+      "meta": {
+        "uri": "/o/{rid}",
+        "method": "POST",
+        "userAuth": true,
+        "response": "order"
+      },
+      "properties": {
+        "rid": {
+          "type": "string",
+          "description": "Ordr.in's unique restaurant identifier for the restaurant.",
+          "formatDescription": "A number",
+          "pattern": "^[0-9]+$",
+          "default_value": "10517"
+        },
+        "tray": {
+          "type": "string",
+          "description": "Represents a tray of menu items in the format '[menu item id]/[qty],[option id],...,[option id]'",
+          "pattern": "^([0-9]+/[0-9]+(,[0-9]+)*(\\+(?=[0-9]))?)+$",
+          "default_value": "13621733/2,13621743+13621799/1"
+        },
+        "tip": {
+          "type": "string",
+          "description": "Tip amount in dollars and cents",
+          "pattern": "[0-9]+\\.[0-9]{2}",
+          "default_value": "5.00"
+        },
+        "first_name": {
+          "type": "string",
+          "description": "The customer's first name",
+          "default_value": "Test"
+        },
+        "last_name": {
+          "type": "string",
+          "description": "The customer's last name",
+          "default_value": "User"
+        }
+      },
+      "allOf": [
+        {
+          "split": true,
+          "oneOf": [
+            {
+              "title": "Address",
+              "split_id": "addr",
+              "required": [
+                "phone",
+                "zip",
+                "addr",
+                "city",
+                "state"
+              ],
+              "properties": {
+                "phone": {
+                  "type": "string",
+                  "description": "The customer's phone number",
+                  "format": "phone",
+                  "mutator": "phone",
+                  "default_value": "555-555-5555"
+                },
+                "zip": {
+                  "type": "string",
+                  "description": "The zip code part of the address",
+                  "formatDescription": "5 digits",
+                  "pattern": "^[0-9]{5}$",
+                  "default_value": "10003"
+                },
+                "addr": {
+                  "type": "string",
+                  "description": "The street address",
+                  "default_value": "900 Broadway"
+                },
+                "addr2": {
+                  "type": "string",
+                  "description": "The second part of the street address, if needed"
+                },
+                "city": {
+                  "type": "string",
+                  "description": "The city part of the address",
+                  "default_value": "New York"
+                },
+                "state": {
+                  "type": "string",
+                  "description": "The state part of the address",
+                  "formatDescription": "Two letters",
+                  "pattern": "^[A-Za-z]{2}$",
+                  "mutator": "state",
+                  "default_value": "NY"
+                }
+              },
+              "type": "object"
+            },
+            {
+              "title": "Saved Address",
+              "split_id": "saved_addr",
+              "required": [
+                "nick"
+              ],
+              "properties": {
+                "nick": {
+                  "type": "string",
+                  "description": "The delivery location nickname. (From the user's addresses)",
+                  "default_value": "temp"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "split": true,
+          "oneOf": [
+            {
+              "title": "Credit Card",
+              "split_id": "cc",
+              "required": [
+                "card_number",
+                "card_cvc",
+                "card_expiry",
+                "card_bill_addr",
+                "card_bill_city",
+                "card_bill_state",
+                "card_bill_zip",
+                "card_bill_phone"
+              ],
+              "properties": {
+                "card_name": {
+                  "type": "string",
+                  "description": "Full name as it appears on the credit card",
+                  "default_value": "Test User"
+                },
+                "card_number": {
+                  "type": "string",
+                  "description": "Credit card number",
+                  "formatDescription": "16 digits",
+                  "pattern": "^[0-9]{16}$",
+                  "default_value": "4111111111111111"
+                },
+                "card_cvc": {
+                  "type": "string",
+                  "description": "3 or 4 digit security code",
+                  "formatDescription": "3 or 4 digits",
+                  "pattern": "^[0-9]{3,4}$",
+                  "default_value": "000"
+                },
+                "card_expiry": {
+                  "type": "string",
+                  "description": "The credit card expiration date.",
+                  "formatDescription": "mm/yyyy",
+                  "pattern": "^[0-9]{2}/[0-9]{4}$",
+                  "default_value": "12/2121"
+                },
+                "card_bill_addr": {
+                  "type": "string",
+                  "description": "The credit card's billing street address",
+                  "default_value": "900 Broadway"
+                },
+                "card_bill_addr2": {
+                  "type": "string",
+                  "description": "The second part of the credit card's biling street address."
+                },
+                "card_bill_city": {
+                  "type": "string",
+                  "description": "The credit card's billing city",
+                  "default_value": "New York"
+                },
+                "card_bill_state": {
+                  "type": "string",
+                  "description": "The credit card's billing state",
+                  "formatDescription": "2 letters",
+                  "pattern": "^[A-Za-z]{2}$",
+                  "mutator": "state",
+                  "default_value": "NY"
+                },
+                "card_bill_zip": {
+                  "type": "string",
+                  "description": "The credit card's billing zip code",
+                  "formatDescription": "5 digits",
+                  "pattern": "^[0-9]{5}$",
+                  "default_value": "10003"
+                },
+                "card_bill_phone": {
+                  "type": "string",
+                  "description": "The credit card's billing phone number",
+                  "format": "phone",
+                  "mutator": "phone",
+                  "default_value": "555-555-5555"
+                }
+              }
+            },
+            {
+              "title": "Saved Credit Card",
+              "split_id": "saved_cc",
+              "required": [
+                "card_nick"
+              ],
+              "properties": {
+                "card_nick": {
+                  "type": "string",
+                  "description": "The credit card nickname. (From the user's credit cards)",
+                  "default_value": "temp"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "split": false,
+          "oneOf": [
+            {
+              "required": [
+                "delivery_date",
+                "delivery_time"
+              ],
+              "properties": {
+                "delivery_date": {
+                  "type": "string",
+                  "description": "Delivery date",
+                  "formatDescription": "mm-dd",
+                  "pattern": "^[0-9]{2}-[0-9]{2}$"
+                },
+                "delivery_time": {
+                  "type": "string",
+                  "description": "Delivery time",
+                  "formatDescription": "HH:MM",
+                  "pattern": "^[0-9]{2}:[0-9]{2}$"
+                }
+              }
+            },
+            {
+              "required": [
+                "delivery_date"
+              ],
+              "properties": {
+                "delivery_date": {
+                  "type": "string",
+                  "description": "Delivery date",
+                  "formatDescription": "ASAP",
+                  "pattern": "^ASAP$",
+                  "default_value": "ASAP"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "restaurant": {
+    "delivery_check": {
+      "type": "object",
+      "title": "Delivery Check",
+      "description": "Gets if a particular restaurant will deliver to a given address at a given time",
+      "required": [
+        "datetime",
+        "rid",
+        "addr",
+        "city",
+        "zip"
+      ],
+      "meta": {
+        "uri": "/dc/{rid}/{datetime}/{zip}/{city}/{addr}",
+        "method": "GET",
+        "userAuth": false,
+        "controller": "DeliverabilityCtrl",
+        "ctrl_fn": "handleDelivery",
+        "response": "delivery_check"
+      },
+      "properties": {
+        "datetime": {
+          "type": "string",
+          "description": "Delivery date and time",
+          "formatDescription": "ASAP or mm-dd+HH:MM",
+          "pattern": "^(ASAP)|[0-9]{2}-[0-9]{2}\\+[0-9]{2}:[0-9]{2}$",
+          "default_value": "ASAP"
+        },
+        "rid": {
+          "type": "string",
+          "description": "Ordr.in's unique restaurant identifier for the restaurant.",
+          "formatDescription": "A number",
+          "pattern": "^[0-9]+$",
+          "default_value": "10517"
+        },
+        "addr": {
+          "type": "string",
+          "description": "Delivery location street address",
+          "default_value": "900 Broadway"
+        },
+        "city": {
+          "type": "string",
+          "description": "Delivery location city",
+          "default_value": "New York"
+        },
+        "zip": {
+          "type": "string",
+          "description": "The zip code part of the address",
+          "formatDescription": "5 digits",
+          "pattern": "^[0-9]{5}$",
+          "default_value": "10003"
+        }
+      }
+    },
+    "delivery_list": {
+      "type": "object",
+      "title": "Delivery List",
+      "description": "Gets a list of all restaurants that deliver to a given address",
+      "required": [
+        "datetime",
+        "addr",
+        "city",
+        "zip"
+      ],
+      "meta": {
+        "uri": "/dl/{datetime}/{zip}/{city}/{addr}/",
+        "method": "GET",
+        "userAuth": false,
+        "controller": "RestaurantListCtrl",
+        "ctrl_fn": "getList",
+        "response": "delivery_list"
+      },
+      "properties": {
+        "datetime": {
+          "type": "string",
+          "description": "Delivery date and time",
+          "formatDescription": "ASAP or mm-dd+HH:MM",
+          "pattern": "^(ASAP)|[0-9]{2}-[0-9]{2}\\+[0-9]{2}:[0-9]{2}$",
+          "default_value": "ASAP"
+        },
+        "addr": {
+          "type": "string",
+          "description": "Delivery location street address",
+          "default_value": "900 Broadway"
+        },
+        "city": {
+          "type": "string",
+          "description": "Delivery location city",
+          "default_value": "New York"
+        },
+        "zip": {
+          "type": "string",
+          "description": "The zip code part of the address",
+          "formatDescription": "5 digits",
+          "pattern": "^[0-9]{5}$",
+          "default_value": "10003"
+        }
+      }
+    },
+    "fee": {
+      "type": "object",
+      "title": "Fee",
+      "description": "Calculates all fees for a given subtotal and delivery address",
+      "required": [
+        "datetime",
+        "rid",
+        "subtotal",
+        "tip",
+        "addr",
+        "city",
+        "zip"
+      ],
+      "meta": {
+        "uri": "/fee/{rid}/{subtotal}/{tip}/{datetime}/{zip}/{city}/{addr}",
+        "method": "GET",
+        "userAuth": false,
+        "controller": "DeliverabilityCtrl",
+        "ctrl_fn": "handleDelivery",
+        "response": "fee"
+      },
+      "properties": {
+        "datetime": {
+          "type": "string",
+          "description": "Delivery date and time",
+          "formatDescription": "ASAP or mm-dd+HH:MM",
+          "pattern": "^(ASAP)|[0-9]{2}-[0-9]{2}\\+[0-9]{2}:[0-9]{2}$",
+          "default_value": "ASAP"
+        },
+        "rid": {
+          "type": "string",
+          "description": "Ordr.in's unique restaurant identifier for the restaurant.",
+          "formatDescription": "A number",
+          "pattern": "^[0-9]+$",
+          "default_value": "10517"
+        },
+        "subtotal": {
+          "type": "string",
+          "description": "The cost of all items in the tray in dollars and cents.",
+          "pattern": "[0-9]+\\.[0-9]{2}",
+          "default_value": "30.00"
+        },
+        "tip": {
+          "type": "string",
+          "description": "The tip in dollars and cents.",
+          "pattern": "[0-9]+\\.[0-9]{2}",
+          "default_value": "4.50"
+        },
+        "addr": {
+          "type": "string",
+          "description": "Delivery location street address",
+          "default_value": "900 Broadway"
+        },
+        "city": {
+          "type": "string",
+          "description": "Delivery location city",
+          "default_value": "New York"
+        },
+        "zip": {
+          "type": "string",
+          "description": "The zip code part of the address",
+          "formatDescription": "5 digits",
+          "pattern": "^[0-9]{5}$",
+          "default_value": "10003"
+        }
+      }
+    },
+    "restaurant_details": {
+      "type": "object",
+      "title": "Restaurant Details",
+      "description": "Gets restaurant details such as the restaurant's menu",
+      "required": [
+        "rid"
+      ],
+      "meta": {
+        "uri": "/rd/{rid}",
+        "method": "GET",
+        "userAuth": false,
+        "response": "restaurant_details"
+      },
+      "properties": {
+        "rid": {
+          "type": "string",
+          "description": "Ordr.in's unique restaurant identifier for the restaurant.",
+          "formatDescription": "A number",
+          "pattern": "^[0-9]+$",
+          "default_value": "10517"
+        }
+      }
+    }
+  },
+  "user": {
+    "change_password": {
+      "type": "object",
+      "title": "Change Password",
+      "description": "Changes a user's password",
+      "required": [
+        "email",
+        "password"
+      ],
+      "meta": {
+        "uri": "/u/{email}/password",
+        "method": "PUT",
+        "userAuth": true,
+        "response": "success_fail"
+      },
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The user's email address",
+          "format": "email"
+        },
+        "password": {
+          "type": "string",
+          "description": "The user's new password",
+          "formatDescription": "SHA256 hex encoded",
+          "mutator": "sha256"
+        }
+      }
+    },
+    "create_account": {
+      "type": "object",
+      "title": "Create Account",
+      "description": "Creates a new account",
+      "required": [
+        "email",
+        "pw",
+        "first_name",
+        "last_name"
+      ],
+      "meta": {
+        "uri": "/u/{email}",
+        "method": "POST",
+        "userAuth": false,
+        "response": "success_fail"
+      },
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The user's email address",
+          "format": "email"
+        },
+        "pw": {
+          "type": "string",
+          "description": "The user's password",
+          "mutator": "sha256"
+        },
+        "first_name": {
+          "type": "string",
+          "description": "The user's first name",
+          "default_value": "Test"
+        },
+        "last_name": {
+          "type": "string",
+          "description": "The user's last name",
+          "default_value": "User"
+        }
+      }
+    },
+    "create_addr": {
+      "type": "object",
+      "title": "Create Address",
+      "description": "Create a new address or modify an existing address",
+      "required": [
+        "email",
+        "nick",
+        "phone",
+        "zip",
+        "addr",
+        "city",
+        "state"
+      ],
+      "meta": {
+        "uri": "/u/{email}/addrs/{nick}",
+        "method": "PUT",
+        "userAuth": true,
+        "response": "success_fail"
+      },
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The user's email address",
+          "format": "email"
+        },
+        "nick": {
+          "type": "string",
+          "description": "The nickname of this address",
+          "default_value": "temp"
+        },
+        "phone": {
+          "type": "string",
+          "description": "The customer's phone number",
+          "format": "phone",
+          "mutator": "phone",
+          "default_value": "555-555-5555"
+        },
+        "zip": {
+          "type": "string",
+          "description": "The zip code part of the address",
+          "formatDescription": "5 digits",
+          "pattern": "^[0-9]{5}$",
+          "default_value": "10003"
+        },
+        "addr": {
+          "type": "string",
+          "description": "The street address",
+          "default_value": "900 Broadway"
+        },
+        "addr2": {
+          "type": "string",
+          "description": "The second part of the street address, if needed"
+        },
+        "city": {
+          "type": "string",
+          "description": "The city part of the address",
+          "default_value": "New York"
+        },
+        "state": {
+          "type": "string",
+          "description": "The state part of the address",
+          "formatDescription": "Two letters",
+          "pattern": "^[A-Za-z]{2}$",
+          "mutator": "state",
+          "default_value": "NY"
+        }
+      },
+      "split_id": "addr"
+    },
+    "create_cc": {
+      "type": "object",
+      "title": "Create Credit Card",
+      "description": "Create a new credit card or modify an existing address",
+      "required": [
+        "email",
+        "nick",
+        "card_number",
+        "card_cvc",
+        "card_expiry",
+        "bill_addr",
+        "bill_city",
+        "bill_state",
+        "bill_zip",
+        "bill_phone"
+      ],
+      "meta": {
+        "uri": "/u/{email}/ccs/{nick}",
+        "method": "PUT",
+        "userAuth": true,
+        "response": "success_fail"
+      },
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The user's email address",
+          "format": "email"
+        },
+        "nick": {
+          "type": "string",
+          "description": "The nickname of this address",
+          "default_value": "temp"
+        },
+        "card_number": {
+          "type": "string",
+          "description": "Credit card number",
+          "formatDescription": "16 digits",
+          "pattern": "^[0-9]{16}$",
+          "default_value": "4111111111111111"
+        },
+        "card_cvc": {
+          "type": "string",
+          "description": "3 or 4 digit security code",
+          "formatDescription": "3 or 4 digits",
+          "pattern": "^[0-9]{3,4}$",
+          "default_value": "000"
+        },
+        "card_expiry": {
+          "type": "string",
+          "description": "The credit card expiration date.",
+          "formatDescription": "Two digits/Four digits",
+          "pattern": "^[0-9]{2}/[0-9]{4}$",
+          "default_value": "12/2121"
+        },
+        "bill_addr": {
+          "type": "string",
+          "description": "The credit card's billing street address",
+          "default_value": "900 Broadway"
+        },
+        "bill_addr2": {
+          "type": "string",
+          "description": "The second part of the credit card's biling street address."
+        },
+        "bill_city": {
+          "type": "string",
+          "description": "The credit card's billing city",
+          "default_value": "New York"
+        },
+        "bill_state": {
+          "type": "string",
+          "description": "The credit card's billing state",
+          "formatDescription": "2 letters",
+          "pattern": "^[A-Za-z]{2}$",
+          "mutator": "state",
+          "default_value": "NY"
+        },
+        "bill_zip": {
+          "type": "string",
+          "description": "The credit card's billing zip code",
+          "formatDescription": "5 digits",
+          "pattern": "^[0-9]{5}$",
+          "default_value": "10003"
+        },
+        "bill_phone": {
+          "type": "string",
+          "description": "The credit card's billing phone number",
+          "format": "phone",
+          "mutator": "phone",
+          "default_value": "555-555-5555"
+        }
+      }
+    },
+    "delete_addr": {
+      "type": "object",
+      "title": "Remove address",
+      "description": "Deletes a single saved address",
+      "required": [
+        "email",
+        "nick"
+      ],
+      "meta": {
+        "uri": "/u/{email}/addrs/{nick}",
+        "method": "DELETE",
+        "userAuth": true,
+        "response": "success_fail"
+      },
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The user's email address",
+          "format": "email"
+        },
+        "nick": {
+          "type": "string",
+          "description": "The nickname of this address",
+          "default_value": "temp"
+        }
+      }
+    },
+    "delete_cc": {
+      "type": "object",
+      "title": "Remove Credit Card",
+      "description": "Deletes a single saved credit card",
+      "required": [
+        "email",
+        "nick"
+      ],
+      "meta": {
+        "uri": "/u/{email}/ccs/{nick}",
+        "method": "DELETE",
+        "userAuth": true,
+        "response": "success_fail"
+      },
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The user's email address",
+          "format": "email"
+        },
+        "nick": {
+          "type": "string",
+          "description": "The nickname of this address",
+          "default_value": "temp"
+        }
+      }
+    },
+    "get_account_info": {
+      "type": "object",
+      "title": "Get Account Information",
+      "description": "Gets information about an authenticated user",
+      "required": [
+        "email"
+      ],
+      "meta": {
+        "uri": "/u/{email}",
+        "method": "GET",
+        "userAuth": true,
+        "response": "user_info"
+      },
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The user's email address",
+          "format": "email"
+        }
+      }
+    },
+    "get_all_saved_addrs": {
+      "type": "object",
+      "title": "Get All Saved Addresses",
+      "description": "Gets all addresses saved to a user's account",
+      "required": [
+        "email"
+      ],
+      "meta": {
+        "uri": "/u/{email}/addrs",
+        "method": "GET",
+        "userAuth": true,
+        "response": "all_saved_addrs"
+      },
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The user's email address",
+          "format": "email"
+        }
+      }
+    },
+    "get_all_saved_ccs": {
+      "type": "object",
+      "title": "Get all saved credit cards",
+      "description": "Gets all credit cards saved to a user's account",
+      "required": [
+        "email"
+      ],
+      "meta": {
+        "uri": "/u/{email}/ccs",
+        "method": "GET",
+        "userAuth": true,
+        "response": "all_saved_ccs"
+      },
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The user's email address",
+          "format": "email"
+        }
+      }
+    },
+    "get_order": {
+      "type": "object",
+      "title": "Get an Order",
+      "description": "Gets a summary of previous orders",
+      "required": [
+        "email",
+        "oid"
+      ],
+      "meta": {
+        "uri": "/u/{email}/orders/{oid}",
+        "method": "GET",
+        "userAuth": true,
+        "response": "saved_order"
+      },
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The user's email address",
+          "format": "email"
+        },
+        "oid": {
+          "type": "string",
+          "description": "Ordr.in's unique order id number.",
+          "formatDescription": "A number",
+          "pattern": "^[0-9]+$"
+        }
+      }
+    },
+    "get_order_history": {
+      "type": "object",
+      "title": "Get Order History",
+      "description": "Gets a summary of previous orders",
+      "required": [
+        "email"
+      ],
+      "meta": {
+        "uri": "/u/{email}/orders",
+        "method": "GET",
+        "userAuth": true,
+        "response": "all_saved_orders"
+      },
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The user's email address",
+          "format": "email"
+        }
+      }
+    },
+    "get_saved_addr": {
+      "type": "object",
+      "title": "Get a single saved address",
+      "description": "Gets a single saved address by its nickname",
+      "required": [
+        "email",
+        "nick"
+      ],
+      "meta": {
+        "uri": "/u/{email}/addrs/{nick}",
+        "method": "GET",
+        "userAuth": true,
+        "response": "saved_addr"
+      },
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The user's email address",
+          "format": "email"
+        },
+        "nick": {
+          "type": "string",
+          "description": "The nickname of this address",
+          "default_value": "temp"
+        }
+      }
+    },
+    "get_saved_cc": {
+      "type": "object",
+      "title": "Get a single saved credit card",
+      "description": "Gets a single saved credit card by its nickname",
+      "required": [
+        "email",
+        "nick"
+      ],
+      "meta": {
+        "uri": "/u/{email}/ccs/{nick}",
+        "method": "GET",
+        "userAuth": true,
+        "response": "saved_cc"
+      },
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The user's email address",
+          "format": "email"
+        },
+        "nick": {
+          "type": "string",
+          "description": "The nickname of this address",
+          "default_value": "temp"
+        }
+      }
+    }
+  }
+}

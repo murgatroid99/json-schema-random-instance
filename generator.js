@@ -9,7 +9,7 @@
     return String.fromCharCode(_.random(48, 90));
   };
 
-  var defaultMax = 20;
+  var defaultMax = RandExp.prototype.max = 10;
 
   // All of these functions assume that the schema is valid and consistent
   var gen = {};
@@ -27,6 +27,7 @@
       case "ipv4" : return _.map([1,2,3,4], function(){return _.random(255).toString();}).join('.');
       case "ipv6" : return randexp(/[abcdef\d]{4}(:[abcdef\d]{4}){7}/);
       case "uri" : return randexp(/\w+\.example\.com\/\w+/);
+      case "phone" : return randexp(/\d{3}-\d{3}-\d{4}/);
       default : return randexp(/.*/);
     }
   };
@@ -107,7 +108,7 @@
   };
 
   gen["string"] = function(schema){
-    var min = Math.max(0, schema.minLength);
+    var min = Math.max(1, schema.minLength);
     var max = schema.maxLength;
     if(_.has(schema, "pattern")){
       return randexp(schema.pattern);
@@ -147,25 +148,35 @@
     }
   };
 
-  function combineProperties(source, dest, prop, combiner){
+  function combineProperties(source, dest, prop, combiner, def){
     if(_.has(source, prop)){
       if(_.has(dest, prop)){
-        return combiner(source[prop], dest[prop]);
+        return combiner(source[prop], dest[prop], source, dest);
       } else {
         return source[prop];
       }
     } else {
       if(_.has(dest, prop)){
         return dest[prop];
+      } else {
+        return def;
       }
     }
   };
 
   function mergeSchemas(dest, source){
+    if(source === undefined){
+      throw new Error("source");
+    }
+    if(dest === undefined){
+      throw new Error("dest");
+    }
     var result = {};
-    result.multipleOf = dest.multipleOf * source.multipleOf;
-    result.maximum = Math.min(dest.maximum, source.maximum);
-    result.minimum = Math.max(dest.minimum, source.minimum);
+    var destAdditionalProps = normalize(_.isObject(dest.additionalProperties) ? dest.additionalProperties : {});
+    var srcAdditionalProps = normalize(_.isObject(source.additionalProperties) ? source.additionalProperties : {});
+    result.multipleOf = combineProperties(source, dest, "multipleOf", function(a,b){return a*b;}, 1);
+    result.maximum = combineProperties(source, dest, "maximum", Math.min, defaultMax);
+    result.minimum = combineProperties(source, dest, "maximum", Math.max, -defaultMax);
     result.maxLength = Math.min(dest.maxLength, source.maxLength);
     result.minLength = Math.max(dest.minLength, source.minLength);
     if(_.has(source, "pattern")){
@@ -191,21 +202,21 @@
       }
     }
     result.maxItems = Math.min(dest.maxItems, source.maxItems);
-    result.minItems = Math.max(dest.minItems, source.maxItems);
+    result.minItems = Math.max(dest.minItems, source.minItems);
     if(_.has(source, "items")){
       if(_.has(dest, "items")){
         if(_.isArray(source.items)){
           if(_.isArray(dest.items)){
             while(dest.items.length < source.items.length){
               if(_.isObject(dest.additionalItems)){
-                dest.items = dest.items.concat(dest.additionalItems);
+                dest.items = dest.items.concat(normalize(dest.additionalItems));
               } else {
                 dest.items = dest.items.concat({});
               }
             }
             while(source.items.length < dest.items.length){
               if(_.isObject(source.additionalItems)){
-                source.items = source.items.concat(dest.additionalItems);
+                source.items = source.items.concat(normalize(dest.additionalItems));
               } else {
                 source.items = source.items.concat({});
               }
@@ -235,7 +246,7 @@
         result.items = dest.items;
       }
     }
-    if(souce.additionalItems && dest.additionalItems){
+    if(source.additionalItems && dest.additionalItems){
       if(_.isObject(source.additionalItems)){
         if(_.isObject(dest.additionalItems)){
           result.additionalItems = mergeSchemas(source.additionalItems, dest.additionalItems);
@@ -243,20 +254,32 @@
           result.additionalItems = source.additionalItems;
         }
       } else {
-        result = source.additionalItems && dest.additionalItems;
+        result.additionalItems = source.additionalItems && dest.additionalItems;
       }
     }
     result.uniqueItems = source.uniqueItems || dest.uniqueItems;
-    result.properties = {};
-    _.each(_.intersection(_.keys(source.properties), _.keys(dest.properties)), function(name){
-      result.properties[name] = mergeSchemas(source.properties[name], dest.properties[name]);
-    });
-    _.each(_.difference(_.keys(source.properties), _.keys(dest.properties)), function(name){
-      result.properties[name] = mergeSchemas(source.properties[name], dest.additionalProperties);
-    });
-    _.each(_.difference(_.keys(dest.properties), _.keys(source.properties)), function(name){
-      result.properties[name] = mergeSchemas(dest.properties[name], source.additionalProperties);
-    });
+    if(_.has(source, "properties")){
+      if(_.has(dest, "properties")){
+        result.properties = {};
+        _.each(_.intersection(_.keys(source.properties), _.keys(dest.properties)), function(name){
+          result.properties[name] = mergeSchemas(source.properties[name], dest.properties[name]);
+        });
+        
+        _.each(_.difference(_.keys(source.properties), _.keys(dest.properties)), function(name){
+          result.properties[name] = mergeSchemas(source.properties[name], normalize(destAdditionalProps));
+        });
+        
+        _.each(_.difference(_.keys(dest.properties), _.keys(source.properties)), function(name){
+          result.properties[name] = mergeSchemas(dest.properties[name], normalize(srcAdditionalProps));
+        });
+      } else {
+        result.properties = source.properties;
+      }
+    } else {
+      if(_.has(dest, "properties")){
+        result.properties = dest.properties
+      }
+    }
     result.maxProperties = Math.min(source.maxProperties, dest.maxProperties);
     result.minProperties = Math.max(source.minProperties, dest.minProperties);
     result.required = _.union(source.required, dest.required);
@@ -320,8 +343,6 @@
       minItems : 0,
       uniqueItems : false,
       properties : {},
-      patternProperties : {},
-      additionalProperties : {},
       maxProperties : Infinity,
       minProperties : 0,
       required : []
@@ -343,9 +364,6 @@
     if(schema.additionalProperties === true){
       schema.additionalProperties = {};
     }
-    schema = _.defaults(schema, defaultSchema);
-    allOf = schema.allOf;
-    delete schema.allOf;
     if(_.has(schema, "oneOf")){
       schema.oneOf = _.map(schema.oneOf, normalize);
     }
@@ -362,6 +380,9 @@
     if(_.isObject(schema.additionalItems)){
       schema.additionalItems = normalize(schema.additionalItems);
     }
+    schema = _.defaults(schema, defaultSchema);
+    allOf = _.clone(schema.allOf);
+    delete schema.allOf;
     _.each(allOf, function(subschema){
       schema = mergeSchemas(schema, normalize(subschema));
     });

@@ -1,0 +1,27 @@
+{
+  "name" : "json-schema-random-instance",
+  "description" : "Generates random instances from a JSON schema",
+  "version" : "0.1.0",
+  "author" : "Michael Lumish",
+  "repository" : {
+    "type" : "git",
+    "url" : "git://github.com/murgatroid99/json-schema-random-instance.git"
+  },
+  "keywords" : [
+    "json",
+    "schema",
+    "instance",
+    "generator"
+  ],
+  "dependencies" : {
+    "randexp" : "0.3.x",
+    "underscore" : "1.5.x"
+  },
+  "license" : "MIT",
+  "bugs" : "https://github.com/murgatroid99/json-schema-random-instance/issues",
+  "files" : [
+    "generator.js",
+    "README.md"
+  ],
+  "main" : "generator.js"
+}

@@ -6,7 +6,7 @@
   var randexp = RandExp.randexp;
 
   RandExp.prototype.anyRandChar = function(){
-    return String.fromCharCode(_.random(48, 90));
+    return String.fromCharCode(_.random(32, 90));
   };
 
   var defaultMax = RandExp.prototype.max = 10;
@@ -132,7 +132,7 @@
     if(_.isEmpty(choice.type)){
       return null;
     } else {
-      return gen[choice.type[_.random(choice.type.length-1)]](schema);
+      return gen[choice.type[_.random(choice.type.length-1)]](choice);
     }
   };
 
@@ -165,12 +165,6 @@
   };
 
   function mergeSchemas(dest, source){
-    if(source === undefined){
-      throw new Error("source");
-    }
-    if(dest === undefined){
-      throw new Error("dest");
-    }
     var result = {};
     var destAdditionalProps = normalize(_.isObject(dest.additionalProperties) ? dest.additionalProperties : {});
     var srcAdditionalProps = normalize(_.isObject(source.additionalProperties) ? source.additionalProperties : {});
@@ -315,14 +309,20 @@
     if(_.has(source, "oneOf")){
       if(_.has(dest, "oneOf")){
         result.oneOf = _.flatten(_.map(source.oneOf, function(subschema){
-          return _.map(dest.oneOf, _.partial(mergeSchemas, subschema));
+          return _.map(dest.oneOf, function(item){
+            return mergeSchemas(subschema, item);
+          });
         }));
       } else {
         result.oneOf = source.oneOf;
       }
     } else {
-      result.oneOf = dest.oneOf;
+      if(_.has(dest, "oneOf")){
+        result.oneOf = dest.oneOf;
+      }
     }
+
+    result.type = _.intersection(source.type, dest.type);
 
     return result;
   }
@@ -345,7 +345,8 @@
       properties : {},
       maxProperties : Infinity,
       minProperties : 0,
-      required : []
+      required : [],
+      type : ["array", "boolean", "integer", "number", "null", "object", "string"]
     };
     if(_.isString(schema.type)){
       schema.type = [schema.type];
@@ -383,15 +384,12 @@
     schema = _.defaults(schema, defaultSchema);
     allOf = _.clone(schema.allOf);
     delete schema.allOf;
-    _.each(allOf, function(subschema){
-      schema = mergeSchemas(schema, normalize(subschema));
-    });
+    schema = _.reduce(_.map(allOf, normalize), mergeSchemas, schema);
     return schema;
   };
 
   module.exports = function(schema){
     var norm = normalize(schema);
-
-    this.generate = _.partial(generate, schema);
+    this.generate = _.partial(generate, norm);
   };
 }());

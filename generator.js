@@ -6,7 +6,8 @@
   var randexp = RandExp.randexp;
 
   RandExp.prototype.anyRandChar = function(){
-    return String.fromCharCode(_.random(32, 90));
+    var characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_ ";
+    return characters[_.random(characters.length-1)];
   };
 
   var defaultMax = RandExp.prototype.max = 10;

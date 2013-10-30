@@ -37,7 +37,7 @@
   gen["array"] = function(schema){
     var maxItems = schema.maxItems;
     var minItems = schema.minItems;
-    var intance = [];
+    var instance = [];
     var amount;
     var items;
     var i;
